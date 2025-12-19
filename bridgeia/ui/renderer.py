@@ -45,12 +45,14 @@ class LevelRenderer:
                 pos = simulation.get_joint_position(a.anchor_id)
                 if pos:
                     points[a.anchor_id] = pos
+            stresses = simulation.get_edge_stresses()
         else:
             # Use design positions
             points.update(bridge.joints)
+            stresses = None
 
         self._draw_banks(level)
-        self._draw_edges(bridge, points)
+        self._draw_edges(bridge, points, stresses)
         self._draw_preview(preview_line)
         self._draw_anchors(level, bridge, points, selected_anchor)
         self._draw_hud(level, bridge, simulation_active=simulation is not None, grid_enabled=grid_enabled, grid_size=grid_size)
@@ -84,10 +86,14 @@ class LevelRenderer:
         # Draw level anchors (fixed vs non-fixed)
         for anchor in level.anchors:
             pos = points.get(anchor.anchor_id)
-            if not pos:
+            if not pos or (pos[0] != pos[0]) or (pos[1] != pos[1]): # Check for NaN
                 continue
             color = (80, 200, 120) if anchor.fixed else (200, 200, 80)
-            pygame.draw.circle(self.screen, color, (int(pos[0]), int(pos[1])), 6)
+            try:
+                draw_pos = (int(pos[0]), int(pos[1]))
+                pygame.draw.circle(self.screen, color, draw_pos, 6)
+            except ValueError:
+                continue
             
             if anchor.anchor_id == selected_anchor:
                 pygame.draw.circle(self.screen, (240, 240, 240), (int(pos[0]), int(pos[1])), 10, 2)
@@ -95,21 +101,47 @@ class LevelRenderer:
         # Draw bridge joints
         for j_id in bridge.joints:
             pos = points.get(j_id)
-            if not pos:
+            if not pos or (pos[0] != pos[0]) or (pos[1] != pos[1]):
                 continue
             color = (200, 200, 200)
-            pygame.draw.circle(self.screen, color, (int(pos[0]), int(pos[1])), 4)
+            try:
+                draw_pos = (int(pos[0]), int(pos[1]))
+                pygame.draw.circle(self.screen, color, draw_pos, 4)
              
-            if j_id == selected_anchor:
-                pygame.draw.circle(self.screen, (240, 240, 240), (int(pos[0]), int(pos[1])), 8, 2)
+                if j_id == selected_anchor:
+                    pygame.draw.circle(self.screen, (240, 240, 240), draw_pos, 8, 2)
+            except ValueError:
+                continue
 
 
-    def _draw_edges(self, bridge: BridgeDesign, points: dict[str, tuple[float, float]]) -> None:
+    def _draw_edges(
+        self, 
+        bridge: BridgeDesign, 
+        points: dict[str, tuple[float, float]], 
+        stresses: dict[int, float] | None = None
+    ) -> None:
         for edge in bridge.edges:
             start = points.get(edge.a)
             end = points.get(edge.b)
             if start and end:
-                pygame.draw.line(self.screen, (200, 170, 80), start, end, 4)
+                # Default color (wood-ish)
+                color = (200, 170, 80)
+                
+                # If simulation provides stress, interpolate color
+                if stresses is not None:
+                    stress = stresses.get(edge.edge_id, 0.0)
+                    # Stress 0.0 -> Green/Safe, 1.0 -> Red/Danger
+                    # Let's map 0.0 -> (100, 255, 100) and 1.0 -> (255, 50, 50)
+                    t = min(1.0, max(0.0, stress))
+                    
+                    # Simple lerp
+                    r = int(100 * (1 - t) + 255 * t)
+                    g = int(255 * (1 - t) + 50 * t)
+                    b = int(100 * (1 - t) + 50 * t)
+                    
+                    color = (r, g, b)
+                    
+                pygame.draw.line(self.screen, color, start, end, 4)
 
     def _draw_preview(self, preview_line: tuple[tuple[int, int], tuple[int, int]] | None) -> None:
         if preview_line is None:

@@ -28,6 +28,11 @@ class BridgeDesign:
         return edge
 
     def add_joint(self, x: float, y: float) -> str:
+        # Check for existing joint at this position to prevent duplicates
+        for j_id, pos in self.joints.items():
+            if abs(pos[0] - x) < 0.1 and abs(pos[1] - y) < 0.1:
+                return j_id
+        
         joint_id = f"j_{self.next_joint_id}"
         self.joints[joint_id] = (x, y)
         self.next_joint_id += 1
