@@ -1,0 +1,18 @@
+{
+  "name": "level_01",
+  "budget": 1200,
+  "goal": {
+    "type": "reach_x",
+    "x": 900
+  },
+  "banks": [
+    {"x1": 0, "y1": 520, "x2": 300, "y2": 520},
+    {"x1": 700, "y1": 520, "x2": 1000, "y2": 520}
+  ],
+  "anchors": [
+    {"id": "left_anchor_1", "x": 120, "y": 480, "fixed": true},
+    {"id": "left_anchor_2", "x": 240, "y": 480, "fixed": true},
+    {"id": "right_anchor_1", "x": 760, "y": 480, "fixed": true},
+    {"id": "right_anchor_2", "x": 880, "y": 480, "fixed": true}
+  ]
+}
