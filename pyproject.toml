@@ -7,7 +7,7 @@ packages = [{ include = "bridgeia" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pygame = "^2.5.2"
+pygame-ce = "^2.5.2"
 pymunk = "^6.6.0"
 
 [tool.poetry.group.dev.dependencies]

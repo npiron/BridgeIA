@@ -1,48 +1,46 @@
 # BridgeIA
 
-[![CI](https://github.com/BridgeIA/BridgeIA/actions/workflows/ci.yml/badge.svg)](https://github.com/BridgeIA/BridgeIA/actions/workflows/ci.yml)
-[![Dependency Review](https://github.com/BridgeIA/BridgeIA/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/BridgeIA/BridgeIA/actions/workflows/dependency-review.yml)
+Prototype de jeu de construction de ponts (type "Poly Bridge") alimenté par une IA, développé en Python avec Pygame et Pymunk.
 
-BridgeIA is a lightweight Poly Bridge-like prototype built with Pygame and Pymunk.
+## Fonctionnalités
 
-## Features
+- **Construction Libre** : Créez des joints et des segments de pont où vous voulez (respectant la longueur maximale).
+- **Simulation Physique** : Testez la stabilité de votre pont avec un moteur physique réaliste (gravité, contraintes).
+- **Interface Intuitive** : Mode construction et mode simulation avec grille aimantée.
 
-- Build bridges by connecting anchor points.
-- Budget-aware construction constraints.
-- Simple level renderer for quick iteration.
+## Prérequis
 
-## Requirements
+Pour lancer ce projet localement, vous avez besoin de :
 
-- Python 3.11+
-- [Poetry](https://python-poetry.org/)
+- **Python 3.11** ou supérieur
+- **Poetry** (Gestionnaire de dépendances Python)
 
-## Getting started
+## Installation et Lancement
 
-```bash
-poetry install
-poetry run python -m bridgeia
-```
+### Démarrage Rapide
 
-### Render a screenshot
+1. Rendez le script exécutable :
+   ```bash
+   chmod +x run_local.sh
+   ```
 
-```bash
-poetry run python -m bridgeia --screenshot artifacts/bridgeia.png
-```
+2. Lancez le jeu :
+   ```bash
+   ./run_local.sh
+   ```
 
-## Contributing
+## Contrôles
 
-We welcome contributions! Please read [`CONTRIBUTING.md`](.github/CONTRIBUTING.md) for setup tips,
-branching guidance, and how to submit changes.
+| Action | Touche / Commande |
+|--------|-------------------|
+| **Sélectionner / Construire** | Clic Gauche (sur ancre ou dans le vide pour créer un joint) |
+| **Supprimer** | Clic Droit (sur segment ou joint) |
+| **Annuler Sélection** | Échap (ESC) |
+| **Lancer / Arrêter Simulation** | Espace (SPACE) |
+| **Activer/Désactiver Grille** | G |
+| **Ajuster Taille Grille** | `[` et `]` (ou touches adjacentes) |
 
-## Code of Conduct
-
-This project follows the Contributor Covenant. Please read [`CODE_OF_CONDUCT.md`](.github/CODE_OF_CONDUCT.md)
-for expected behavior.
-
-## Security
-
-Please see [`SECURITY.md`](.github/SECURITY.md) for reporting security issues.
-
-## License
-
-License information will be added soon.
+### Astuces de jeu
+- Utilisez la grille pour aligner parfaitement vos triangles.
+- Si le curseur "snappe" (saute) sur la grille, vous pouvez être sûr de la position.
+- Les points existants sont prioritaires sur la grille : si vous cliquez près d'un point, vous le sélectionnerez.
