@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import argparse
+import os
 from pathlib import Path
 
 import pygame
@@ -16,6 +18,11 @@ ANCHOR_SNAP_RADIUS = 18
 
 
 def run() -> None:
+    args = parse_args()
+    if args.screenshot:
+        render_screenshot(Path(args.screenshot))
+        return
+
     pygame.init()
     screen = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("BridgeIA")
@@ -31,6 +38,8 @@ def run() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                selected_anchor = None
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 anchor = find_anchor_at(level, event.pos)
                 if anchor is None:
@@ -47,10 +56,43 @@ def run() -> None:
 
         preview_line = build_preview_line(level, selected_anchor)
 
-        renderer.draw(level, bridge, preview_line)
+        renderer.draw(level, bridge, preview_line, selected_anchor)
         pygame.display.flip()
         clock.tick(60)
 
+    pygame.quit()
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="BridgeIA prototype")
+    parser.add_argument(
+        "--screenshot",
+        type=str,
+        help="Render a static frame to an image file and exit.",
+    )
+    return parser.parse_args()
+
+
+def render_screenshot(output_path: Path) -> None:
+    os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+    screen = pygame.display.set_mode(WINDOW_SIZE)
+    pygame.display.set_caption("BridgeIA")
+
+    level = Level.from_json(LEVEL_PATH)
+    renderer = LevelRenderer(screen)
+    bridge = BridgeDesign(edges=[])
+    anchor_ids = [anchor.anchor_id for anchor in level.anchors]
+    if len(anchor_ids) >= 2:
+        try_add_edge(level, bridge, anchor_ids[0], anchor_ids[1])
+    if len(anchor_ids) >= 3:
+        try_add_edge(level, bridge, anchor_ids[1], anchor_ids[2])
+
+    renderer.draw(level, bridge, preview_line=None, selected_anchor=None)
+    pygame.display.flip()
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pygame.image.save(screen, str(output_path))
     pygame.quit()
 
 
