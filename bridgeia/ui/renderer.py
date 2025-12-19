@@ -11,12 +11,18 @@ class LevelRenderer:
         self.screen = screen
         self.font = pygame.font.Font(None, 24)
 
-    def draw(self, level: Level, bridge: BridgeDesign, preview_line: tuple[tuple[int, int], tuple[int, int]] | None) -> None:
+    def draw(
+        self,
+        level: Level,
+        bridge: BridgeDesign,
+        preview_line: tuple[tuple[int, int], tuple[int, int]] | None,
+        selected_anchor: str | None,
+    ) -> None:
         self.screen.fill((18, 18, 24))
         self._draw_banks(level)
         self._draw_edges(level, bridge)
         self._draw_preview(preview_line)
-        self._draw_anchors(level)
+        self._draw_anchors(level, selected_anchor)
         self._draw_hud(level, bridge)
 
     def _draw_banks(self, level: Level) -> None:
@@ -29,10 +35,12 @@ class LevelRenderer:
                 8,
             )
 
-    def _draw_anchors(self, level: Level) -> None:
+    def _draw_anchors(self, level: Level, selected_anchor: str | None) -> None:
         for anchor in level.anchors:
             color = (80, 200, 120) if anchor.fixed else (200, 200, 80)
             pygame.draw.circle(self.screen, color, (anchor.x, anchor.y), 8)
+            if anchor.anchor_id == selected_anchor:
+                pygame.draw.circle(self.screen, (240, 240, 240), (anchor.x, anchor.y), 12, 2)
 
     def _draw_edges(self, level: Level, bridge: BridgeDesign) -> None:
         anchors = {anchor.anchor_id: (anchor.x, anchor.y) for anchor in level.anchors}
@@ -52,6 +60,17 @@ class LevelRenderer:
         cost_text = self.font.render(f"Cost: {bridge.total_cost()}", True, (220, 220, 220))
         remaining = level.budget - bridge.total_cost()
         remaining_text = self.font.render(f"Remaining: {remaining}", True, (220, 220, 220))
+        edges_text = self.font.render(f"Edges: {len(bridge.edges)}", True, (220, 220, 220))
         self.screen.blit(budget_text, (20, 20))
         self.screen.blit(cost_text, (20, 44))
         self.screen.blit(remaining_text, (20, 68))
+        self.screen.blit(edges_text, (20, 92))
+
+        controls = [
+            "Left click: select anchors / add edge",
+            "Right click: remove edge",
+            "Esc: cancel selection",
+        ]
+        for index, line in enumerate(controls):
+            text = self.font.render(line, True, (180, 180, 180))
+            self.screen.blit(text, (20, 540 + index * 22))
