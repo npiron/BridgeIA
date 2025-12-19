@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "bridgeia"
+version = "0.1.0"
+description = "Poly Bridge-like prototype"
+authors = ["BridgeIA Team"]
+packages = [{ include = "bridgeia" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pygame = "^2.5.2"
+pymunk = "^6.6.0"
+
+[tool.poetry.group.dev.dependencies]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
